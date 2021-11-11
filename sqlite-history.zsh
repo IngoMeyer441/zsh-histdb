@@ -204,11 +204,12 @@ $sep$sep') as ${1:-cmd} from history left join commands on history.command_id=co
 
 histdb-sync () {
     _histdb_init
+    local git_return_code=0
 
     # this ought to apply to other readers?
     echo "truncating WAL"
     echo 'pragma wal_checkpoint(truncate);' | _histdb_query_batch
-    
+
     local hist_dir="${HISTDB_FILE:h}"
     if [[ -d "$hist_dir" ]]; then
         () {
@@ -224,12 +225,15 @@ histdb-sync () {
             fi
             _histdb_stop_sqlite_pipe # Stop in case of a merge, starting again afterwards
             git commit -am "history" && git pull --no-edit && git push
+            git_return_code="$?"
             _histdb_start_sqlite_pipe
             popd -q
         }
     fi
 
     echo 'pragma wal_checkpoint(passive);' | _histdb_query_batch
+
+    return "${git_return_code}"
 }
 
 histdb () {

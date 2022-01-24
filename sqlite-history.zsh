@@ -14,7 +14,7 @@ else
     typeset -g HISTDB_FILE
 fi
 
-typeset -g HISTDB_INODE=""
+typeset -g HISTDB_INODE=()
 typeset -g HISTDB_SQLITE_PID=""
 typeset -g HISTDB_SESSION=""
 typeset -g HISTDB_HOST=""
@@ -23,7 +23,7 @@ typeset -g HISTDB_INSTALLED_IN="${(%):-%N}"
 
 
 sql_escape () {
-    print -r ${${@//\'/\'\'}//$'\x00'}
+    print -r -- ${${@//\'/\'\'}//$'\x00'}
 }
 
 _histdb_query () {
